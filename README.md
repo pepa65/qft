@@ -1,6 +1,6 @@
 # ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 [![Rust](https://github.com/pepa65/qft/actions/workflows/rust.yml/badge.svg)](https://github.com/pepa65/qft/actions/workflows/rust.yml) 
-# qft v0.6.1
+# qft v0.6.2
 **Quick true peer-to-peer UDP File Transfer**
 
 QFT is a small application for Quick (and really reliable) peer-to-peer UDP File Transfer.
@@ -68,14 +68,14 @@ cargo build --release --verbose --target=x86_64-unknown-linux-musl
 
 ### Help text
 ```
-qft v0.6.1 - Quick file transfer
-Usage:  qft COMMAND ARGUMENT...
+qft v0.6.2 - Quick file transfer
+Usage:  qft [COMMAND [ARGUMENT...]]
     COMMAND:
-        H | helper  PORT
-        S | send  FILE PASSWORD [ADDRESS:PORT [DELAY [BITRATE [SKIP]]]]
-        R | receive  FILE PASSWORD [ADDRESS:PORT [BITRATE [SKIP]]]
+        H | helper PORT
+        S | send FILE PASSWORD [ADDRESS:PORT [DELAY [BITRATE [SKIP]]]]
+        R | receive FILE PASSWORD [ADDRESS:PORT [BITRATE [SKIP]]]
         V | version
-        help
+        [help]
 ```
 
 ### Environment variables

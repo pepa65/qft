@@ -570,7 +570,7 @@ fn main() {
         panic!("No commandline...");
     }
     if args.len() == 1 {
-        usage(&args, "No command");
+        usage(&args, "");
     }
     match args.get(1).unwrap().as_str() { // Command
         "help" => usage(&args, ""),
@@ -599,13 +599,13 @@ fn usage(args: &Vec<String>, msg: &str) {
     let c = f[f.len()-1];
     println!("\
 {} v{} - Quick file transfer
-Usage:  {} COMMAND ARGUMENT...
+Usage:  {} [COMMAND [ARGUMENT...]]
     COMMAND:
-        H | helper  PORT
-        S | send  FILE PASSWORD [ADDRESS:PORT] [DELAY [BITRATE [SKIP]]]
-        R | receive  FILE PASSWORD [ADDRESS:PORT] [BITRATE [SKIP]]
+        H | helper PORT
+        S | send FILE PASSWORD [ADDRESS:PORT [DELAY [BITRATE [SKIP]]]]
+        R | receive FILE PASSWORD [ADDRESS:PORT [BITRATE [SKIP]]]
         V | version
-        help"
+        [help]"
         , c, env!("CARGO_PKG_VERSION"), c);
     if msg.len() == 0 {
         std::process::exit(0);
