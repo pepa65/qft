@@ -99,15 +99,13 @@ impl SafeReadWrite {
                         try_again = false;
                         self.packet_count_in += 1;
                         r.1 = x - 3;
-                    } else if id > self.packet_count_in as u16
-                        && (id - self.packet_count_in as u16) < 0xC000
-                    {
+                    } else if id > self.packet_count_in as u16 && (id - self.packet_count_in as u16) < 0xC000 {
                         if !is_catching_up && !env::var("QFT_HIDE_DROPS").is_ok() {
                             println!("\r\x1b[KA packet dropped: {} (got) is newer than {} (expected)",
                                 &id, &(self.packet_count_in as u16));
                         }
                         is_catching_up = true;
-                        // ask to resend, then do nothing
+                        // Ask to resend, then do nothing
                         let id = (self.packet_count_in as u16).to_be_bytes();
                         self.socket
                             .send(&[id[0], id[1], ResendRequest as u8])
@@ -152,7 +150,7 @@ impl SafeReadWrite {
         let mut vbuf = Vec::from(buf);
         vbuf.insert(0, packet as u8);
         vbuf.insert(0, id[1]);
-        vbuf.insert(0, id[0]); // this is now the first byte
+        vbuf.insert(0, id[0]);  // This is now the first byte
         let buf = vbuf.as_slice();
 
         loop {
@@ -193,9 +191,7 @@ impl SafeReadWrite {
                 },
                 self.socket.recv(&mut buf).ok(),
                 self.socket.set_nonblocking(false).unwrap(),
-            )
-                .1
-            {
+            ).1 {
                 Some(x) => {
                     if x != 3 {
                         continue;
@@ -208,8 +204,8 @@ impl SafeReadWrite {
                                 println!("\r\x1b[KPacket ID wrap successful.");
                             }
                             wait = false;
-                            self.last_transmitted.clear(); // if the latest packet is ACK'd, all
-                                                           // previous ones must be as well.
+                            // If the latest packet is ACK'd, all previous ones must be as well
+                            self.last_transmitted.clear();
                         }
                     }
                     if buf[2] == ResendRequest as u8 {
@@ -225,8 +221,7 @@ impl SafeReadWrite {
                             while n <= idn && !(idn == 0xffff && n == 0) {
                                 let buf = self.last_transmitted.get(&n);
                                 if let Some(buf) = buf {
-                                    loop {
-                                        // resend until success
+                                    loop { // Resend until success
                                         match self.socket.send(&buf.as_slice()) {
                                             Ok(x) => {
                                                 if x != buf.len() {
@@ -243,17 +238,17 @@ impl SafeReadWrite {
                                 } else {
                                     break;
                                 }
-                                // do NOT remove from last_transmitted yet, wait for Ack to do that.
+                                // Do NOT remove from last_transmitted yet, wait for Ack to do that
                                 n += 1;
                             }
                         }
                     }
                 }
                 None => {
-                    if unix_millis() - start > 5000 && exit_on_lost { // Check lost on exit after 5 s
+                    if unix_millis() - start > 5000 && exit_on_lost { // Check lost on exit after 5s
                         break;
                     }
-                    if unix_millis() - start > 10000 { // Retry after 10 s
+                    if unix_millis() - start > 10000 { // Retry after 10s
                         println!("\n10s passed since last packet ==> Connection broken. Trying to resend packet...");
                         if let Some(buf) = self.last_transmitted.get(&idn) {
                             loop {
@@ -302,14 +297,6 @@ pub fn helper(args: &Vec<String>) {
     let mut map: HashMap<[u8; 200], SocketAddr> = HashMap::new();
     let listener = UdpSocket::bind(&bind_addr).expect("Unable to create socket");
     let mut buf = [0 as u8; 200];
-    //let mut last_log_time = unix_millis();
-    //let mut amount_since_log = 0;
-    //let mut helper_log = OpenOptions::new()
-    //    .create(true)
-    //    .write(true)
-    //    .append(true)
-    //    .open("qft_helper_log.txt")
-    //    .expect("Unable to create helper log");
     loop {
         let (l, addr) = listener.recv_from(&mut buf).expect("Read error");
         if l != 200 {
@@ -317,7 +304,7 @@ pub fn helper(args: &Vec<String>) {
         }
         if map.contains_key(&buf) {
             let other = map.get(&buf).unwrap();
-            // we got a connection
+            // We got a connection
             let mut bytes: &[u8] = addr.to_string().bytes().collect::<Vec<u8>>().leak();
             let mut addr_buf = [0 as u8; 200];
             for i in 0..bytes.len().min(200) {
@@ -328,32 +315,13 @@ pub fn helper(args: &Vec<String>) {
             for i in 0..bytes.len().min(200) {
                 other_buf[i] = bytes[i];
             }
-            if listener.send_to(&addr_buf, other).is_ok()
-                && listener.send_to(&other_buf, addr).is_ok()
-            {
-                // success!
-                //amount_since_log += 1;
-                //if unix_millis() - last_log_time > 10000 {
-                    let d = PrimitiveDateTime::new(
-                        Date::from_calendar_date(1970, time::Month::January, 1).unwrap(),
-                        Time::MIDNIGHT,
-                    ) + Duration::from_millis(unix_millis());
-                    print!("{} UTC  ", d);
-                    //helper_log
-                    //    .write(
-                    //        format!(
-                    //            "{} | {} {}>\n",
-                    //            d,
-                    //            amount_since_log,
-                    //            amount_since_log * Wrap("=")
-                    //        )
-                    //        .as_bytes(),
-                    //    )
-                    //    .expect("error writing to log");
-                    //helper_log.flush().expect("error writing to log");
-                    //last_log_time = unix_millis();
-                    //amount_since_log = 0;
-                //}
+            if listener.send_to(&addr_buf, other).is_ok() && listener.send_to(&other_buf, addr).is_ok() {
+                // Success!
+                let d = PrimitiveDateTime::new(
+                    Date::from_calendar_date(1970, time::Month::January, 1).unwrap(),
+                    Time::MIDNIGHT,
+                 ) + Duration::from_millis(unix_millis());
+                print!("{} UTC  ", d);
                 println!("Connected {} & {}", addr, other);
             }
             map.remove(&buf);
@@ -536,7 +504,7 @@ fn holepunch(args: &Vec<String>) -> UdpSocket {
     }
     holepunch.send(&buf).expect("Unable to send to helper");
     holepunch.recv(&mut buf).expect("Unable to receive from helper");
-    // buf should now contain our partner's address data.
+    // Now buf should contain partner's address data
     let mut s = Vec::from(buf);
     s.retain(|e| *e != 0);
     let bind_addr = String::from_utf8_lossy(s.as_slice()).to_string();
@@ -604,8 +572,7 @@ fn main() {
     if args.len() == 1 {
         usage(&args, "No command");
     }
-    match args.get(1).unwrap().as_str()  // Command
-    {
+    match args.get(1).unwrap().as_str() { // Command
         "help" => usage(&args, ""),
         "h" => usage(&args, ""),
         "-h" => usage(&args, ""),
