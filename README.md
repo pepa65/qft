@@ -1,3 +1,5 @@
+# ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
+[![Rust](https://github.com/pepa65/qft/actions/workflows/rust.yml/badge.svg)](https://github.com/pepa65/qft/actions/workflows/rust.yml) 
 # qft v0.6.1
 **Quick true peer-to-peer UDP File Transfer**
 
