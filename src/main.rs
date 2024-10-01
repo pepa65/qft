@@ -33,6 +33,9 @@ struct SafeReadWrite {
 
 struct Wrap<T>(T);
 
+static VERSION: &str = env!("CARGO_PKG_VERSION");
+static HELPER: &str = "tudbut.de:4277";
+
 impl Mul<Wrap<&str>> for u64 {
     type Output = String;
 
@@ -88,7 +91,7 @@ impl SafeReadWrite {
                     if id <= self.packet_count_in as u16 {
                         self.socket
                             .send(&[buf[0], buf[1], Ack as u8])
-                            .expect("send error");
+                            .expect("Send error");
                     }
                     if id == self.packet_count_in as u16 {
                         if id == 0xffff {
@@ -101,11 +104,8 @@ impl SafeReadWrite {
                         && (id - self.packet_count_in as u16) < 0xC000
                     {
                         if !is_catching_up && !env::var("QFT_HIDE_DROPS").is_ok() {
-                            println!(
-                                "\r\x1b[KA packet dropped: {} (got) is newer than {} (expected)",
-                                &id,
-                                &(self.packet_count_in as u16)
-                            );
+                            println!("\r\x1b[KA packet dropped: {} (got) is newer than {} (expected)",
+                                &id, &(self.packet_count_in as u16));
                         }
                         is_catching_up = true;
                         // ask to resend, then do nothing
@@ -143,10 +143,7 @@ impl SafeReadWrite {
         delay: u64,
     ) -> Result<(), Error> {
         if buf.len() > 0xfffc {
-            panic!(
-                "too large data packet sent over SafeReadWrite ({} > 0xfffc)",
-                buf.len()
-            );
+            panic!("Too large data packet sent over SafeReadWrite ({} > 0xfffc)", buf.len());
         }
 
         let id = (self.packet_count_out as u16).to_be_bytes();
@@ -254,11 +251,11 @@ impl SafeReadWrite {
                     }
                 }
                 None => {
-                    if unix_millis() - start > 5000 && exit_on_lost {
+                    if unix_millis() - start > 5000 && exit_on_lost { // Check lost on exit after 5 s
                         break;
                     }
-                    if unix_millis() - start > 10000 {
-                        println!("\n10s passed since last packet ==> Contact broke. Trying to resend packet...");
+                    if unix_millis() - start > 10000 { // Retry after 10 s
+                        println!("\n10s passed since last packet ==> Connection broken. Trying to resend packet...");
                         if let Some(buf) = self.last_transmitted.get(&idn) {
                             loop {
                                 match self.socket.send(buf) {
@@ -275,8 +272,8 @@ impl SafeReadWrite {
                                 break;
                             }
                             start = unix_millis();
-                        } else {
-                            break; // Latest packet was already ACK'd ==> No packets properly lost ==> Can continue with next packet.
+                        } else { // Latest packet ACK'd, no packets really lost, continue with next packet
+                            break;
                         }
                     }
                     if !wait {
@@ -292,55 +289,30 @@ impl SafeReadWrite {
     }
 }
 
-fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() == 0 {
-        panic!("no args");
-    }
-    if args.len() == 1 {
-        #[cfg(feature = "gui")]
-        match gui::gui() {
-            Ok(_) => (),
-            Err(_) => print_args(&args),
-        }
-        #[cfg(not(feature = "gui"))]
-        print_args(&args)
-    }
-    match args
-        .get(1)
-        .unwrap() // checked in previous if-statement
-        .as_str()
-    {
-        "helper" => helper(&args),
-        "sender" => sender(&args, |_| {}),
-        "receiver" => receiver(&args, |_| {}),
-        #[cfg(feature = "gui")]
-        "gui" => gui::gui().expect("can't use gui"),
-        #[cfg(not(feature = "gui"))]
-        "gui" => println!("Feature 'gui' was not enabled during compilation. GUI not available."),
-        "version" => println!("QFT version: {}", env!("CARGO_PKG_VERSION")),
-        _ => print_args(&args),
-    }
-}
-
 pub fn helper(args: &Vec<String>) {
+    if args.len() > 3 {
+        print_args(args, "Too many arguments");
+    }
+    if args.len() < 3 {
+        print_args(args, "No PORT given");
+    }
     let bind_addr = (
         "0.0.0.0",
-        u16::from_str_radix(args[2].as_str(), 10).expect("invalid port: must be integer"),
+        u16::from_str_radix(args[2].as_str(), 10).expect("Invalid port: must be integer"),
     );
     let mut map: HashMap<[u8; 200], SocketAddr> = HashMap::new();
-    let listener = UdpSocket::bind(&bind_addr).expect("unable to create socket");
+    let listener = UdpSocket::bind(&bind_addr).expect("Unable to create socket");
     let mut buf = [0 as u8; 200];
-    let mut last_log_time = unix_millis();
-    let mut amount_since_log = 0;
-    let mut helper_log = OpenOptions::new()
-        .create(true)
-        .write(true)
-        .append(true)
-        .open("qft_helper_log.txt")
-        .expect("unable to create helper log");
+    //let mut last_log_time = unix_millis();
+    //let mut amount_since_log = 0;
+    //let mut helper_log = OpenOptions::new()
+    //    .create(true)
+    //    .write(true)
+    //    .append(true)
+    //    .open("qft_helper_log.txt")
+    //    .expect("Unable to create helper log");
     loop {
-        let (l, addr) = listener.recv_from(&mut buf).expect("read error");
+        let (l, addr) = listener.recv_from(&mut buf).expect("Read error");
         if l != 200 {
             continue;
         }
@@ -361,28 +333,29 @@ pub fn helper(args: &Vec<String>) {
                 && listener.send_to(&other_buf, addr).is_ok()
             {
                 // success!
-                println!("Helped {} and {}! :D", addr, other);
-                amount_since_log += 1;
-                if unix_millis() - last_log_time > 10000 {
+                //amount_since_log += 1;
+                //if unix_millis() - last_log_time > 10000 {
                     let d = PrimitiveDateTime::new(
                         Date::from_calendar_date(1970, time::Month::January, 1).unwrap(),
                         Time::MIDNIGHT,
                     ) + Duration::from_millis(unix_millis());
-                    helper_log
-                        .write(
-                            format!(
-                                "{} | {} {}>\n",
-                                d,
-                                amount_since_log,
-                                amount_since_log * Wrap("=")
-                            )
-                            .as_bytes(),
-                        )
-                        .expect("error writing to log");
-                    helper_log.flush().expect("error writing to log");
-                    last_log_time = unix_millis();
-                    amount_since_log = 0;
-                }
+                    print!("{} UTC  ", d);
+                    //helper_log
+                    //    .write(
+                    //        format!(
+                    //            "{} | {} {}>\n",
+                    //            d,
+                    //            amount_since_log,
+                    //            amount_since_log * Wrap("=")
+                    //        )
+                    //        .as_bytes(),
+                    //    )
+                    //    .expect("error writing to log");
+                    //helper_log.flush().expect("error writing to log");
+                    //last_log_time = unix_millis();
+                    //amount_since_log = 0;
+                //}
+                println!("Connected {} & {}", addr, other);
             }
             map.remove(&buf);
         } else {
@@ -397,25 +370,25 @@ pub fn sender<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
         .get(5)
         .map(|s| u64::from_str_radix(s, 10))
         .unwrap_or(Ok(500))
-        .expect("bad delay operand");
+        .expect("Non-numeric DELAY operand");
     let br = args
         .get(6)
         .map(|s| u32::from_str_radix(s, 10))
         .unwrap_or(Ok(256))
-        .expect("bad bitrate argument");
+        .expect("Non-numeric BITRATE argument");
     let begin = args
         .get(7)
         .map(|s| u64::from_str_radix(s, 10))
         .unwrap_or(Ok(0))
-        .expect("bad begin operand");
+        .expect("Non-numeric SKIP operand");
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(br as usize, 0);
     let mut buf = buf.leak();
-    let mut file = File::open(args.get(4).unwrap_or_else(|| {
-        print_args(args);
-        panic!("unreachable")
+    let mut file = File::open(args.get(2).unwrap_or_else(|| {
+        print_args(args, "No FILE");
+        panic!("notreached")
     }))
-    .expect("file not readable");
+    .expect("File not readable");
 
     if begin != 0 {
         println!("Skipping to {}...", begin);
@@ -432,15 +405,15 @@ pub fn sender<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
     println!("Length: {}", &len);
     let mut time = unix_millis();
     loop {
-        let read = file.read(&mut buf).expect("file read error");
+        let read = file.read(&mut buf).expect("File read error");
         if read == 0 && !env::var("QFT_STREAM").is_ok() {
             println!();
-            println!("Transfer done. Thank you!");
+            println!("Transferred");
             sc.end();
             return;
         }
 
-        sc.write_safe(&buf[..read], dly).expect("send error");
+        sc.write_safe(&buf[..read], dly).expect("Send error");
         bytes_sent += read as u64;
         if (bytes_sent % (br * 20) as u64) < (br as u64) {
             let elapsed = unix_millis() - time;
@@ -467,12 +440,12 @@ pub fn receiver<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
         .get(5)
         .map(|s| u32::from_str_radix(s, 10))
         .unwrap_or(Ok(256))
-        .expect("bad bitrate argument");
+        .expect("Non-numeric BITRATE argument");
     let begin = args
         .get(6)
         .map(|s| u64::from_str_radix(s, 10))
         .unwrap_or(Ok(0))
-        .expect("bad begin operand");
+        .expect("Non-numeric SKIP argument");
     let mut buf: Vec<u8> = Vec::new();
     buf.resize(br as usize, 0);
     let buf: &[u8] = buf.leak();
@@ -480,16 +453,16 @@ pub fn receiver<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
         .truncate(false)
         .write(true)
         .create(true)
-        .open(&args.get(4).unwrap_or_else(|| {
-            print_args(args);
-            panic!("unreachable")
+        .open(&args.get(2).unwrap_or_else(|| {
+            print_args(args, "No FILE");
+            panic!("notreached")
         }))
-        .expect("file not writable");
+        .expect("File not writable");
 
     if begin != 0 {
         println!("Skipping to {}...", begin);
-        file.seek(SeekFrom::Start(begin)).expect("unable to skip");
-        println!("Done.");
+        file.seek(SeekFrom::Start(begin)).expect("Unable to skip");
+        println!("Done");
     }
 
     let mut sc = SafeReadWrite::new(connection);
@@ -498,7 +471,7 @@ pub fn receiver<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
     let mut len_bytes = [0 as u8; 8];
     let len = sc
         .read_safe(&mut len_bytes)
-        .expect("unable to read length from sender")
+        .expect("Unable to read file length from sender")
         .0;
     let len = u64::from_be_bytes([
         len[0], len[1], len[2], len[3], len[4], len[5], len[6], len[7],
@@ -507,16 +480,16 @@ pub fn receiver<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
     println!("Length: {}", &len);
     let mut time = unix_millis();
     loop {
-        let (mbuf, amount) = sc.read_safe(buf).expect("read error");
+        let (mbuf, amount) = sc.read_safe(buf).expect("Read error");
         let buf = &mbuf.leak()[..amount];
         if amount == 0 {
             println!();
-            println!("Transfer done. Thank you!");
+            println!("Transferred");
             return;
         }
 
-        file.write(buf).expect("write error");
-        file.flush().expect("file flush error");
+        file.write(buf).expect("Write error");
+        file.flush().expect("File flush error");
         bytes_received += amount as u64;
         if (bytes_received % (br * 20) as u64) < (br as u64) {
             let elapsed = unix_millis() - time;
@@ -539,40 +512,39 @@ pub fn receiver<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
 
 fn holepunch(args: &Vec<String>) -> UdpSocket {
     let bind_addr = (Ipv4Addr::from(0 as u32), 0);
-    let holepunch = UdpSocket::bind(&bind_addr).expect("unable to create socket");
+    let holepunch = UdpSocket::bind(&bind_addr).expect("Unable to create socket");
+    let mut helper = match env::var_os("QFT_HELPER") {
+        Some(v) => v.into_string().unwrap(),
+        None => HELPER.to_string()
+    };
+    if args.len() > 4 {
+        helper = args.get(4).unwrap().to_string();
+    }
+		println!("Using helper: {}", helper);
     holepunch
-        .connect(args.get(2).unwrap_or_else(|| {
-            print_args(args);
-            panic!("unreachable")
-        }))
-        .expect("unable to connect to helper");
+        .connect(helper)
+        .expect("Unable to connect to helper");
     let bytes = args
         .get(3)
         .unwrap_or_else(|| {
-            print_args(args);
-            panic!("unreachable")
+            print_args(args, "No password");
+            panic!("notreached")
         })
         .as_bytes();
     let mut buf = [0 as u8; 200];
     for i in 0..bytes.len().min(200) {
         buf[i] = bytes[i];
     }
-    holepunch.send(&buf).expect("unable to talk to helper");
-    holepunch
-        .recv(&mut buf)
-        .expect("unable to receive from helper");
+    holepunch.send(&buf).expect("Unable to send to helper");
+    holepunch.recv(&mut buf).expect("Unable to receive from helper");
     // buf should now contain our partner's address data.
     let mut s = Vec::from(buf);
     s.retain(|e| *e != 0);
     let bind_addr = String::from_utf8_lossy(s.as_slice()).to_string();
-    println!(
-        "Holepunching {} (partner) and :{} (you).",
-        bind_addr,
-        holepunch.local_addr().unwrap().port()
-    );
+    println!("Holepunching here ({}) to there ({})", holepunch.local_addr().unwrap().port(), bind_addr);
     holepunch
         .connect(SocketAddrV4::from_str(bind_addr.as_str()).unwrap())
-        .expect("connection failed");
+        .expect("Connection failed");
     holepunch
         .set_read_timeout(Some(Duration::from_secs(1)))
         .unwrap();
@@ -580,9 +552,9 @@ fn holepunch(args: &Vec<String>) -> UdpSocket {
         .set_write_timeout(Some(Duration::from_secs(1)))
         .unwrap();
     if env::var("QFT_USE_TIMED_HOLEPUNCH").is_ok() {
-        println!("Warning: You are using the QFT_USE_TIMED_HOLEPUNCH environment variable. This won't allow for more \
-            backwards-compatibility, rather it only exists as a fallback for bad connections. Please make absolutely \
-            sure your partner uses QFT_USE_TIMED_HOLEPUNCH as well, data might otherwise get corrupted on the receiver.");
+        println!("Warning: You are using the QFT_USE_TIMED_HOLEPUNCH environment variable. This obstructs \
+            backwards-compatibility. It is meant as a fallback for bad connections. Be absolutely sure the \
+            other end uses QFT_USE_TIMED_HOLEPUNCH as well, otherwise data can get corrupted on transfer.");
         println!("Waiting...");
         let mut stop = false;
         while !stop {
@@ -591,7 +563,7 @@ fn holepunch(args: &Vec<String>) -> UdpSocket {
             let _ = holepunch.send(&[0]);
             let result = holepunch.recv(&mut [0, 0]);
             if result.is_ok() && result.unwrap() == 1 {
-                holepunch.send(&[0, 0]).expect("connection failed");
+                holepunch.send(&[0, 0]).expect("Connection failed");
                 let result = holepunch.recv(&mut [0, 0]);
                 if result.is_ok() && result.unwrap() == 2 {
                     stop = true;
@@ -610,8 +582,8 @@ fn holepunch(args: &Vec<String>) -> UdpSocket {
         while result.is_ok() && result.unwrap() == 1 {
             result = holepunch.recv(&mut [0, 0]);
         }
-        holepunch.send(&[0, 0]).expect("connection failed");
-        holepunch.send(&[0, 0]).expect("connection failed");
+        holepunch.send(&[0, 0]).expect("Connection failed");
+        holepunch.send(&[0, 0]).expect("Connection failed");
         result = Ok(1);
         while result.is_ok() && result.unwrap() != 2 {
             result = holepunch.recv(&mut [0, 0]);
@@ -621,22 +593,65 @@ fn holepunch(args: &Vec<String>) -> UdpSocket {
             result = holepunch.recv(&mut [0, 0]);
         }
     }
-    println!("Holepunch and connection successful.");
+    println!("Holepunch and connection successful");
     return holepunch;
 }
 
-fn print_args(args: &Vec<String>) {
-    let f = args.get(0).unwrap();
-    println!(
-        "No arguments. Needed: \n\
-         | {} helper <bind-port>\n\
-         | {} sender <helper-address>:<helper-port> <phrase> <filename> [send-dly] [bitrate] [skip]\n\
-         | {} receiver <helper-address>:<helper-port> <phrase> <filename> [bitrate] [skip]\n\
-         | {} gui\n\
-         | {} version\n",
-        f, f, f, f, f
-    );
-    panic!("No arguments");
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() == 0 {
+        panic!("No commandline...");
+    }
+    if args.len() == 1 { // No command, default to GUI
+        #[cfg(feature = "gui")]
+        match gui::gui() {
+            Ok(_) => (),
+            Err(_) => print_args(&args, "Error launching GUI"),
+        }
+        #[cfg(not(feature = "gui"))]
+        print_args(&args, "No command");
+    }
+    match args
+        .get(1) // Command
+        .unwrap()
+        .as_str()
+    {
+        "-h" => print_args(&args, ""),
+        "--help" => print_args(&args, ""),
+        "help" => print_args(&args, ""),
+        "helper" => helper(&args),
+        "send" => sender(&args, |_| {}),
+        "s" => sender(&args, |_| {}),
+        "receive" => receiver(&args, |_| {}),
+        "r" => receiver(&args, |_| {}),
+        #[cfg(feature = "gui")]
+        "gui" => gui::gui().expect("Can't start gui"),
+        #[cfg(not(feature = "gui"))]
+        "gui" => println!("Feature 'gui' was not enabled during compilation. GUI not available."),
+        "version" => println!("qft v{}", VERSION),
+        "--version" => println!("qft v{}", VERSION),
+        "V" => println!("qft v{}", VERSION),
+        "-V" => println!("qft v{}", VERSION),
+        _ => print_args(&args, "Unrecognized command"),
+    }
+}
+
+fn print_args(args: &Vec<String>, msg: &str) {
+    let f: Vec<_> = args.get(0).unwrap().split('/').collect();
+    let c = f[f.len()-1];
+    println!("{} v{} - Quick file transfer
+Usage:  {} COMMAND ARGUMENT...
+    COMMAND:
+        help
+        helper PORT
+        s|send FILE PASSWORD [ADDRESS:PORT] [DELAY [BITRATE [SKIP]]]
+        r|receive FILE PASSWORD [ADDRESS:PORT] [BITRATE [SKIP]]
+        V|version", c, env!("CARGO_PKG_VERSION"), c);
+    if msg.len() == 0 {
+        std::process::exit(0);
+    }
+    println!(">>> {}", msg);
+    std::process::exit(1);
 }
 
 pub fn unix_millis() -> u64 {
