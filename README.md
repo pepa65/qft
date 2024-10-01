@@ -1,4 +1,4 @@
-# qft v0.6.0
+# qft v0.6.1
 **Quick true peer-to-peer UDP File Transfer**
 
 QFT is a small application for Quick (and really reliable) peer-to-peer UDP File Transfer.
@@ -64,6 +64,18 @@ cargo build --release --verbose --target=x86_64-unknown-linux-musl
   - `BITRATE` can be increased from the default 256 to increase packet size (but servers or routers
     set limits at various sizes!)
 
+### Help text
+```
+qft v0.6.1 - Quick file transfer
+Usage:  qft COMMAND ARGUMENT...
+    COMMAND:
+        H | helper  PORT
+        S | send  FILE PASSWORD [ADDRESS:PORT [DELAY [BITRATE [SKIP]]]]
+        R | receive  FILE PASSWORD [ADDRESS:PORT [BITRATE [SKIP]]]
+        V | version
+        help
+```
+
 ### Environment variables
 * Variables need to be explicitly `export`ed to be recognized as environment variables.
 * If `QFT_STREAM` is set, the sender can use `/dev/stdin` as the FILE to be sending from and data
@@ -85,5 +97,5 @@ One of the ends was not properly connected to the helper. Stop `qft` on both end
 (preferably with a different PASSWORD).
 
 ### [Relevant XKCD](https://xkcd.com/949)
-![Relevant XKCD Image](https://imgs.xkcd.com/comics/file_transfer.png)
+![Relevant XKCD Image](https://imgs.xkcd.com/comics/file_transfer.png "Every time you email a file to yourself so you can pull it up on your friend&#39;s laptop, Tim Berners-Lee sheds a single tear.")
 

@@ -1,5 +1,4 @@
-#[cfg(feature = "gui")]
-mod gui;
+// main.rs
 
 use std::{
     collections::HashMap,
@@ -291,10 +290,10 @@ impl SafeReadWrite {
 
 pub fn helper(args: &Vec<String>) {
     if args.len() > 3 {
-        print_args(args, "Too many arguments");
+        usage(args, "Too many arguments");
     }
     if args.len() < 3 {
-        print_args(args, "No PORT given");
+        usage(args, "No PORT given");
     }
     let bind_addr = (
         "0.0.0.0",
@@ -385,7 +384,7 @@ pub fn sender<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
     buf.resize(br as usize, 0);
     let mut buf = buf.leak();
     let mut file = File::open(args.get(2).unwrap_or_else(|| {
-        print_args(args, "No FILE");
+        usage(args, "No FILE");
         panic!("notreached")
     }))
     .expect("File not readable");
@@ -454,7 +453,7 @@ pub fn receiver<F: Fn(f32)>(args: &Vec<String>, on_progress: F) {
         .write(true)
         .create(true)
         .open(&args.get(2).unwrap_or_else(|| {
-            print_args(args, "No FILE");
+            usage(args, "No FILE");
             panic!("notreached")
         }))
         .expect("File not writable");
@@ -527,7 +526,7 @@ fn holepunch(args: &Vec<String>) -> UdpSocket {
     let bytes = args
         .get(3)
         .unwrap_or_else(|| {
-            print_args(args, "No password");
+            usage(args, "No password");
             panic!("notreached")
         })
         .as_bytes();
@@ -602,51 +601,45 @@ fn main() {
     if args.len() == 0 {
         panic!("No commandline...");
     }
-    if args.len() == 1 { // No command, default to GUI
-        #[cfg(feature = "gui")]
-        match gui::gui() {
-            Ok(_) => (),
-            Err(_) => print_args(&args, "Error launching GUI"),
-        }
-        #[cfg(not(feature = "gui"))]
-        print_args(&args, "No command");
+    if args.len() == 1 {
+        usage(&args, "No command");
     }
-    match args
-        .get(1) // Command
-        .unwrap()
-        .as_str()
+    match args.get(1).unwrap().as_str()  // Command
     {
-        "-h" => print_args(&args, ""),
-        "--help" => print_args(&args, ""),
-        "help" => print_args(&args, ""),
+        "help" => usage(&args, ""),
+        "h" => usage(&args, ""),
+        "-h" => usage(&args, ""),
+        "--help" => usage(&args, ""),
         "helper" => helper(&args),
+        "H" => helper(&args),
         "send" => sender(&args, |_| {}),
         "s" => sender(&args, |_| {}),
+        "S" => sender(&args, |_| {}),
         "receive" => receiver(&args, |_| {}),
         "r" => receiver(&args, |_| {}),
-        #[cfg(feature = "gui")]
-        "gui" => gui::gui().expect("Can't start gui"),
-        #[cfg(not(feature = "gui"))]
-        "gui" => println!("Feature 'gui' was not enabled during compilation. GUI not available."),
+        "R" => receiver(&args, |_| {}),
         "version" => println!("qft v{}", VERSION),
-        "--version" => println!("qft v{}", VERSION),
+        "v" => println!("qft v{}", VERSION),
         "V" => println!("qft v{}", VERSION),
         "-V" => println!("qft v{}", VERSION),
-        _ => print_args(&args, "Unrecognized command"),
+        "--version" => println!("qft v{}", VERSION),
+        _ => usage(&args, "Unrecognized command"),
     }
 }
 
-fn print_args(args: &Vec<String>, msg: &str) {
+fn usage(args: &Vec<String>, msg: &str) {
     let f: Vec<_> = args.get(0).unwrap().split('/').collect();
     let c = f[f.len()-1];
-    println!("{} v{} - Quick file transfer
+    println!("\
+{} v{} - Quick file transfer
 Usage:  {} COMMAND ARGUMENT...
     COMMAND:
-        help
-        helper PORT
-        s|send FILE PASSWORD [ADDRESS:PORT] [DELAY [BITRATE [SKIP]]]
-        r|receive FILE PASSWORD [ADDRESS:PORT] [BITRATE [SKIP]]
-        V|version", c, env!("CARGO_PKG_VERSION"), c);
+        H | helper  PORT
+        S | send  FILE PASSWORD [ADDRESS:PORT] [DELAY [BITRATE [SKIP]]]
+        R | receive  FILE PASSWORD [ADDRESS:PORT] [BITRATE [SKIP]]
+        V | version
+        help"
+        , c, env!("CARGO_PKG_VERSION"), c);
     if msg.len() == 0 {
         std::process::exit(0);
     }

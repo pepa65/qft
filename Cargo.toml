@@ -1,12 +1,7 @@
 [package]
 name = "qft"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
 
 [dependencies]
-iui = { git = "https://github.com/rust-native-ui/libui-rs", optional = true, version = "0.3" }
-rand = { version = "0.8", optional = true }
 time = "0.3"
-
-[features]
-gui = [ "dep:iui", "dep:rand" ]
