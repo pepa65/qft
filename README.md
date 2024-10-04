@@ -1,81 +1,99 @@
-# ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 [![Rust](https://github.com/pepa65/qft/actions/workflows/rust.yml/badge.svg)](https://github.com/pepa65/qft/actions/workflows/rust.yml) 
-# qft v0.6.2
-**Quick true peer-to-peer UDP File Transfer**
+[![dependency status](https://deps.rs/repo/github/pepa65/aegis-cli/status.svg)](https://deps.rs/repo/github/pepa65/aegis-cli)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
-QFT is a small application for Quick (and really reliable) peer-to-peer UDP File Transfer.
-UDP is a connectionless protocol, there are no handshakes, data just gets sent. There is no
+# qft v0.7.0
+**Quick File Transfer, true peer-to-peer over UDP**
+
+QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
+As UDP is a connectionless protocol, there are no handshakes, data just gets sent. There is no
 proper start of the 'connection' and no 'disconnection', the exchange depends on the content
 of the packages. This also makes bypassing NAT more challenging, but it is possible. Apart from
-establishing the connection through an ultralight 'helper', the exchange is truly peer-to-peer.
+establishing the connection through an ultralight __helper__, the exchange is truly peer-to-peer.
 That said, there are measures in place to ensure data integrity. Also (long!) pauses in
-transmission are allowed for, up to hibernating one of the machines; it will resume on wake-up!
-Packet loss/reorder rates of over 10% are tolerated (but will slow transmission speed down!) and
+transmission are allowed for, up to hibernating one of the machines (it will resume on wake-up!).
+Packet loss/reorder rates of over 10% are tolerated (but will slow down transmission speed!) and
 ping times of 1000ms are just as navigable as 10ms ones.
 
 * Repo: https://github.com/pepa65/qft
 * After (and compatible with): https://github.com/tudbut/qft
 * License: GPLv3+
-* Programmed in 100% Rust
+* Standalone single binary programmed in 100% Rust.
 
 ## Build
-### Static musl binary from repo
+### Static musl build from cloned repo
 ```
 # After git-cloning the repo
 rustup target add x86_64-unknown-linux-musl
-cargo build --release --verbose --target=x86_64-unknown-linux-musl
+cargo build --release
 ```
+Or after having installed `zig`:
+`cargo zigbuild --release`
+
+### Dynamic build with cargo
+`cargo install --git https://github.com/pepa65/qft`
 
 ## Usage
+### Sending / Receiving
+* On the sending machine, enter `qft S FILE TAG` where FILE is a filename being sent,
+  and TAG can be freely chosen, but must be the same on both sides.
+* On the receiving machine, enter `qft R FILE TAG` where FILE can be a different name
+  that the data will be saved to, but TAG must be the same.
+* Both machines should start transferring after a short while. If they don't, try again.
+
 ### Helper
 * The QFT helper is specified by and internet address and port, and helps with
   connecting both parties, even when both are behind a NAT/router. (A helper can
   also be on the LAN if both sender and receiver are on the same LAN.) You can use
   and trust publicly provided QFT helpers. They only get to know the IP addresses
-  and the temporary random ports, and the chosen PASSWORD for the exchange.
+  and the temporary random ports, and the chosen TAG for the exchange.
 * The hardcoded default helper is `tudbut.de:4277`.
-* The default helper can be specified in the environment variable `QFT_HELPER`:
+* The default helper can be specified in the environment variable `QFT_HELPER`, like:
   `export QFT_HELPER=qft.4e4.in:1999`.
 * A helper can be run on any machine that has the chosen port open to the internet:
-  `qft helper PORT` and if the PORT number is higher than 1024, no privilege is needed.
-  Running the helper is very low on CPU and bandwith resources, it is not involved in the
-  data transfer, it just establishes the connection based on the same PASSWORD and exchanges
-  the IP address and port for each machine. This is different from `croc`, `portal` or all
-  the `wormhole` applications that all need an actual transfer relay server (unless in some
-  cases, both machines are on the same LAN).
-
-### Sending / Receiving
-* On the sending machine, enter `qft S FILE PASSWORD HELPER` (HELPER is optional, see above.
-  FILE is a filename, and PASSWORD can be freely chosen, but must be the same on both sides.)
-* On the receiving machine, enter `qft R FILE PASSWORD HELPER` (again, HELPER is optional,
-  FILE can be a different name that the file will be saved as, and PASSWORD must be the same.)
-* Both machines should start transferring after a short while. If they don't, try again.
+  `qft helper [PORT]` and if the PORT number is higher than 1024, no privilege is needed.
+  When not supplied, the port defaults to 4277. Running a helper is very low on CPU and
+  bandwith resources, as it only listens and is not involved in the data transfer, it just
+  establishes the connection based on the same TAG, and exchanges the IP address and port
+  for each machine. This is different from `croc`, `portal` or all the `wormhole`
+  applications that all need an actual transfer relay server (unless in some cases,
+  both machines are on the same LAN).
 
 ### Full options
-* `qft help` - Just displays a help text.
-* `qft version` - Just displays the version number.
-* `qft helper PORT` - See **Helper** above.
-* `qft send FILE PASSWORD [HELPER [DELAY [BITRATE [SKIP]]]]`
-* `qft receive FILE PASSWORD [HELPER [BITRATE [SKIP]]]`
-  - `HELPER` is of the form `ADDRESS:PORT`, so `tudbut.de:4277` or `4e4.in:4444`.
-  - The optional arguments of `send` & `receive` to the left need to be there for the optional
-    argument more to the right to be properly identified. So if `DELAY` needs to be specified, then
-    `HELPER` also needs to be supplied.
-  - `DELAY` can be lowered from the default 500 to speed up transfers (lowering the delay between
-    packets), but too low will increase unreliability of the data integrity!
+* `qft help` - Just outputs a help text.
+* `qft readme` - Outputs this README.md.
+* `qft version` - Just outputs the version number.
+* `qft helper [PORT]` - See **Helper** above.
+* `qft send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]`
+* `qft receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]`
+* Arguments:
+  - `PORT` in the `helper` command defaults to 4277 when not supplied.
+  - The first 2 arguments after `send` and `receive` are always `FILE` and `TAG` (in that order).
+  - The filename being sent is `FILE`, as is the filename being saved to on the receiving end.
+  - `TAG` must be the same on both ends in order to for the helper to connect the exchange.
+  - The helper's address & port is `ADDRESS:PORT`, for example `tudbut.de:4277` (the default).
+  - `DELAY` can be lowered from the default 500 to speed up transfers (lowering the delay
+    between packets), but too low will cause unreliability in the data transfer!
   - `BITRATE` can be increased from the default 256 to increase packet size (but servers or routers
-    set limits at various sizes!)
+    set limits at various sizes!).
+  - `START` allows the transfer to start after a certain byte, skipping already transferred parts.
+    Look at the terminal output to find out how many bytes were transferred already.
+    See **Troubleshooting** below.
 
 ### Help text
 ```
-qft v0.6.2 - Quick file transfer
+qft v0.7.0 - Quick file transfer
 Usage:  qft [COMMAND [ARGUMENT...]]
-    COMMAND:
-        H | helper PORT
-        S | send FILE PASSWORD [ADDRESS:PORT [DELAY [BITRATE [SKIP]]]]
-        R | receive FILE PASSWORD [ADDRESS:PORT [BITRATE [SKIP]]]
-        V | version
-        [help]
+COMMAND:
+    help (default command)    Just output this help text.
+    readme                    Output the repo's README.md file.
+    V | version               Just output the version number.
+    H | helper [PORT]         Start helper on PORT (default: 4277).
+    S | send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]
+    R | receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]
+  Defaults: ADDRESS:PORT=tudbut.de:4277 (env.variable QFT_HELPER overrides
+  this, commandline overrides that), DELAY=500, BITRATE=256, START=0 
 ```
 
 ### Environment variables
@@ -83,21 +101,29 @@ Usage:  qft [COMMAND [ARGUMENT...]]
 * If `QFT_STREAM` is set, the sender can use `/dev/stdin` as the FILE to be sending from and data
   can be directed in.
 * Setting `QFT_HIDE_DROPS` suppresses reporting on drops at both the sending and the receiving end.
-* When `QFT_USE_TIMED_HOLEPUNCH` is set **on both ends!** a different transfer mechanism is used,
-  meant to help with bad connections. It is a fallback, not recommended for general use.
+* When `QFT_USE_TIMED_HOLEPUNCH` is set **on both ends!**, a different transfer mechanism is used,
+  meant to help with bad connections. This is meant as a fallback, not recommended for general use.
 
-## Troubleshooting
-### Resume a fully stopped transfer
+### Troubleshooting
+#### Resume a fully stopped transfer
 You most likely never needed unless the transfer completely died due to a very long pause or a
-computer reboot. Then: Ctrl-C whenever `qft` is still running, and start the same command while
-specifying SKIP. This means HELPER, BITRATE, and DELAY on the sender also need to be supplied.
-HELPER could be different from before (as long as it's the same on both ends), BITRATE **must**
-be the same (the default is 256) and DELAY could be different (default is 500).
+computer reboot. Then: Ctrl-C wherever `qft` is still running, and start the same command while
+specifying `-s START`.
 
-### It says `Connecting...` but doesn't connect
+#### It says `Connecting...` but doesn't connect
 One of the ends was not properly connected to the helper. Stop `qft` on both ends and try again
-(preferably with a different PASSWORD).
+(preferably with a different TAG).
+
+## Considerations
+### Security
+#### Helper
+The helper is vulnerable to port-sniffing, and transfers could be 'snatched' by an agent quickly
+deploying a used TAG. If the sender knocked first, the file could be received by the agent, if
+the receiver knocked first, an agent could send (different) data.
+
+#### Transfer
+Transfers on QFT are not end-to-end encrypted, but then, the data only touches the sender and the receiver's machine, there is no man-in-the-middle. Well, there is internet routing... So before sending sensitive data, encrypting it before sending would be prudent.
 
 ### [Relevant XKCD](https://xkcd.com/949)
-![Relevant XKCD Image](https://imgs.xkcd.com/comics/file_transfer.png "Every time you email a file to yourself so you can pull it up on your friend&#39;s laptop, Tim Berners-Lee sheds a single tear.")
+![Relevant XKCD Image](https://imgs.xkcd.com/comics/file_transfer.png "Every time you email a file to yourself so you can pull it up on your friend's laptop, Tim Berners-Lee sheds a single tear.")
 

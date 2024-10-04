@@ -1,7 +1,28 @@
 [package]
 name = "qft"
-version = "0.6.2"
+version = "0.7.0"
 edition = "2021"
 
 [dependencies]
 time = "0.3"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+enum_glob_use = "deny"
+nursery = { level = "deny", priority = -1 }
+unnecessary_wraps = "allow"
+cognitive_complexity = "allow"
+too_many_lines = "allow"
+#unwrap_used = "deny"
+pedantic = { level = "deny", priority = -1 }
+cast_possible_truncation = "allow"
+cast_precision_loss = "allow"
