@@ -1,7 +1,14 @@
 [package]
 name = "qft"
 version = "0.7.1"
+authors = ["Daniel H. github.com/tudbut", "github.com/pepa65"]
 edition = "2021"
+rust-version = "1.81.0"
+description = "Quick File Transfer, true peer-to-peer over UDP"
+repository = "https://github.com/pepa65/qft"
+license = "GPL-3.0-or-later"
+keywords = ["UDP", "file-transfer", "P2P"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 time = "0.3"
@@ -24,5 +31,5 @@ cognitive_complexity = "allow"
 too_many_lines = "allow"
 #unwrap_used = "deny"
 pedantic = { level = "deny", priority = -1 }
-cast_possible_truncation = "allow"
+cast_possible_truncation = "warn"
 cast_precision_loss = "allow"

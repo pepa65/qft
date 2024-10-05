@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
-# qft v0.7.0
+# qft v0.7.2
 **Quick File Transfer, true peer-to-peer over UDP**
 
 QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
@@ -83,7 +83,7 @@ Or after having installed `zig`:
 
 ### Help text
 ```
-qft v0.7.0 - Quick file transfer
+qft v0.7.2 - Quick file transfer
 Usage:  qft [COMMAND [ARGUMENT...]]
 COMMAND:
     help (default command)    Just output this help text.
