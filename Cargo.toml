@@ -1,6 +1,6 @@
 [package]
 name = "qft"
-version = "0.7.1"
+version = "0.7.2"
 authors = ["Daniel H. github.com/tudbut", "github.com/pepa65"]
 edition = "2021"
 rust-version = "1.81.0"
