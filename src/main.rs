@@ -437,7 +437,6 @@ fn receiver<F: Fn(f32)>(cli: &Cli, on_progress: F) {
 fn holepunch(cli: &Cli) -> UdpSocket {
     let bind_addr = (Ipv4Addr::from(0_u32), 0);
     let holepunch = UdpSocket::bind(bind_addr).expect("Unable to create socket");
-println!("{cli:#?}");
     let mut helper = cli.helper.clone();
     if cli.helper.is_empty() {
         helper = env::var_os("QFT_HELPER").map_or_else(|| HELPER.to_string(), |v| v.into_string().unwrap());
@@ -527,7 +526,6 @@ println!("{cli:#?}");
     holepunch
 }
 
-#[derive(Debug)]
 struct Cli {
     binary: String,
     command: String,

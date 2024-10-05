@@ -1,2 +1,6 @@
+[alias]
+rel = "build --release"
+zig = "zigbuild --release"
+
 [build]
 target = "x86_64-unknown-linux-musl"
