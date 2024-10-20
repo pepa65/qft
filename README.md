@@ -1,6 +1,8 @@
 [![Rust](https://github.com/pepa65/qft/actions/workflows/rust.yml/badge.svg)](https://github.com/pepa65/qft/actions/workflows/rust.yml) 
 [![dependency status](https://deps.rs/repo/github/pepa65/aegis-cli/status.svg)](https://deps.rs/repo/github/pepa65/aegis-cli)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![downloads](https://img.shields.io/crates/d/qft.svg)](https://crates.io/crates/qft)
+
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
 # qft v0.7.3
@@ -21,7 +23,15 @@ ping times of 1000ms are just as navigable as 10ms ones.
 * License: GPLv3+
 * Standalone single binary programmed in 100% Rust.
 
-## Build
+## Install
+### Download static single-binary
+```
+wget https://github.com/pepa65/qft/releases/download/0.7.3/qft
+sudo mv qft /usr/local/bin
+sudo chown root:root /usr/local/bin/qft
+sudo chmod +x /usr/local/bin/qft
+```
+
 ### Static musl build from cloned repo
 ```
 # After git-cloning the repo

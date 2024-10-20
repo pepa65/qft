@@ -13,13 +13,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build
-      run:|
-        sudo apt-get update
+      run: |
+        rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
         rustup target add x86_64-unknown-linux-musl
         cargo build --verbose --release --target x86_64-unknown-linux-musl
-    - name: Upload artifacts
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        path: target/x86_64-unknown-linux-musl/release/rw
+        name: qft
+        path: /home/runner/work/qft/qft/target/x86_64-unknown-linux-musl/release/qft
