@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
-# qft v0.7.2
+# qft v0.7.3
 **Quick File Transfer, true peer-to-peer over UDP**
 
 QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
@@ -28,17 +28,15 @@ ping times of 1000ms are just as navigable as 10ms ones.
 rustup target add x86_64-unknown-linux-musl
 cargo build --release
 ```
-Or after having installed `zig`:
-`cargo zigbuild --release`
 
 ### Dynamic build with cargo
 `cargo install --git https://github.com/pepa65/qft`
 
 ## Usage
 ### Sending / Receiving
-* On the sending machine, enter `qft S FILE TAG` where FILE is a filename being sent,
+* On the sending machine, enter `qft s FILE TAG` where FILE is a filename being sent,
   and TAG can be freely chosen, but must be the same on both sides.
-* On the receiving machine, enter `qft R FILE TAG` where FILE can be a different name
+* On the receiving machine, enter `qft r FILE TAG` where FILE can be a different name
   that the data will be saved to, but TAG must be the same.
 * Both machines should start transferring after a short while. If they don't, try again.
 
@@ -61,12 +59,12 @@ Or after having installed `zig`:
   both machines are on the same LAN).
 
 ### Full options
-* `qft help` - Just outputs a help text.
+* `qft h|help|-h|--help` - Just outputs a help text.
 * `qft readme` - Outputs this README.md.
-* `qft version` - Just outputs the version number.
-* `qft helper [PORT]` - See **Helper** above.
-* `qft send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]`
-* `qft receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]`
+* `qft V|version|-V|--version` - Just outputs the version number.
+* `qft H|helper [PORT]` - See **Helper** above.
+* `qft s|S|send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]`
+* `qft r|R|receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]`
 * Arguments:
   - `PORT` in the `helper` command defaults to 4277 when not supplied.
   - The first 2 arguments after `send` and `receive` are always `FILE` and `TAG` (in that order).
@@ -83,15 +81,15 @@ Or after having installed `zig`:
 
 ### Help text
 ```
-qft v0.7.2 - Quick file transfer
+qft v0.7.3 - Quick file transfer
 Usage:  qft [COMMAND [ARGUMENT...]]
 COMMAND:
     help (default command)    Just output this help text.
     readme                    Output the repo's README.md file.
     V | version               Just output the version number.
     H | helper [PORT]         Start helper on PORT (default: 4277).
-    S | send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]
-    R | receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]
+    s | S | send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]
+    r | R | receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]
   Defaults: ADDRESS:PORT=tudbut.de:4277 (env.variable QFT_HELPER overrides
   this, commandline overrides that), DELAY=500, BITRATE=256, START=0 
 ```

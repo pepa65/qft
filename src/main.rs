@@ -631,8 +631,8 @@ COMMAND:
     readme                    Output the repo's README.md file.
     V | version               Just output the version number.
     H | helper [PORT]         Start helper on PORT (default: {DEFAULT_PORT}).
-    S | send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]
-    R | receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]
+    s | S | send FILE TAG [ADDRESS:PORT] [-d DELAY] [-r BITRATE] [-s START]
+    r | R | receive FILE TAG [ADDRESS:PORT] [-r BITRATE] [-s START]
   Defaults: ADDRESS:PORT={HELPER} (env.variable QFT_HELPER overrides
   this, commandline overrides that), DELAY={DELAY}, BITRATE={BITRATE}, START=0
 ",

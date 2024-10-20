@@ -1,7 +1,7 @@
 [package]
 name = "qft"
-version = "0.7.2"
-authors = ["Daniel H. github.com/tudbut", "github.com/pepa65"]
+version = "0.7.3"
+authors = ["github.com/pepa65", "Daniel H. github.com/tudbut"]
 edition = "2021"
 rust-version = "1.81.0"
 description = "Quick File Transfer, true peer-to-peer over UDP"
