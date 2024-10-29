@@ -1,2 +1,3 @@
 /target
-qft
+/Cargo.lock
+/qft

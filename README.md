@@ -5,7 +5,7 @@
 
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
-# qft v0.7.3
+# qft v0.7.4
 **Quick File Transfer, true peer-to-peer over UDP**
 
 QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
@@ -26,21 +26,38 @@ ping times of 1000ms are just as navigable as 10ms ones.
 ## Install
 ### Download static single-binary
 ```
-wget https://github.com/pepa65/qft/releases/download/0.7.3/qft
+wget https://github.com/pepa65/qft/releases/download/0.7.4/qft
 sudo mv qft /usr/local/bin
 sudo chown root:root /usr/local/bin/qft
 sudo chmod +x /usr/local/bin/qft
 ```
 
-### Static musl build from cloned repo
+### Install with cargo
+#### Static musl build from cloned repo
 ```
 # After git-cloning the repo
 rustup target add x86_64-unknown-linux-musl
 cargo build --release
 ```
 
-### Dynamic build with cargo
+#### Dynamic build with cargo
 `cargo install --git https://github.com/pepa65/qft`
+
+### Install with cargo-binstall
+Even without a full Rust toolchain, rust binaries can be installed with the static binary `cargo-binstall`:
+
+```
+# Install cargo-binstall for Linux x86_64
+# (Other versions are available at https://crates.io/crates/cargo-binstall)
+wget github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz
+tar xf cargo-binstall-x86_64-unknown-linux-musl.tgz
+sudo chown root:root cargo-binstall
+sudo mv cargo-binstall /usr/local/bin/
+```
+
+Only a linux-x86_64 (musl) binary available: `cargo-binstall qft`
+
+It will be installed in `~/.cargo/bin/` which will need to be added to `PATH`!
 
 ## Usage
 ### Sending / Receiving
@@ -91,7 +108,7 @@ cargo build --release
 
 ### Help text
 ```
-qft v0.7.3 - Quick file transfer
+qft v0.7.4 - Quick file transfer
 Usage:  qft [COMMAND [ARGUMENT...]]
 COMMAND:
     help (default command)    Just output this help text.

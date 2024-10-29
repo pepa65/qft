@@ -1,6 +1,6 @@
 [package]
 name = "qft"
-version = "0.7.3"
+version = "0.7.4"
 authors = ["github.com/pepa65", "Daniel H. github.com/tudbut"]
 edition = "2021"
 rust-version = "1.81.0"
@@ -9,6 +9,13 @@ repository = "https://github.com/pepa65/qft"
 license = "GPL-3.0-or-later"
 keywords = ["UDP", "file-transfer", "P2P"]
 categories = ["command-line-utilities"]
+
+[package.metadata.binstall]
+pkg-url = "{repo}/releases/download/{version}/{name}"
+pkg-fmt = "bin"
+disabled-strategies = ["quick-install", "compile"]
+target-family = "Linux"
+target-arch = "X86_64"
 
 [dependencies]
 time = "0.3"
