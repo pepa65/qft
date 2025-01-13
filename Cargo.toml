@@ -1,11 +1,13 @@
 [package]
 name = "qft"
-version = "0.7.5"
-authors = ["github.com/pepa65", "Daniel H. github.com/tudbut"]
-edition = "2021"
+version = "0.7.6"
 rust-version = "1.81.0"
+edition = "2021"
+authors = ["github.com/pepa65", "Daniel H. github.com/tudbut"]
 description = "Quick File Transfer, true peer-to-peer over UDP"
 repository = "https://github.com/pepa65/qft"
+documentation = "https://docs.rs/qft"
+readme = "README.md"
 license = "GPL-3.0-or-later"
 keywords = ["UDP", "file-transfer", "P2P"]
 categories = ["command-line-utilities"]
@@ -18,7 +20,7 @@ target-family = "Linux"
 target-arch = "X86_64"
 
 [dependencies]
-time = "0.3"
+time = "0.3.37"
 
 [profile.release]
 opt-level = "z"
