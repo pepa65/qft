@@ -4,7 +4,7 @@ use std::{
 	collections::HashMap,
 	env,
 	fs::{File, OpenOptions},
-	io::{stdout, Error, Read, Seek, SeekFrom, Write as W},
+	io::{Error, Read, Seek, SeekFrom, Write as W, stdout},
 	net::{Ipv4Addr, SocketAddr, SocketAddrV4, UdpSocket},
 	ops::Mul,
 	str::FromStr,
@@ -72,6 +72,7 @@ impl SafeReadWrite {
 		Ok(())
 	}
 
+	#[allow(clippy::cast_possible_truncation)]
 	pub fn read_safe(&mut self, buf: &[u8]) -> Result<(Vec<u8>, usize), Error> {
 		assert!(buf.len() <= MAX_BUF_LEN, "attempted to receive too large data packet with SafeReadWrite ({} > 0xFFFC)", buf.len());
 		let mut mbuf = Vec::from(buf);
@@ -124,6 +125,7 @@ impl SafeReadWrite {
 		self.socket
 	}
 
+	#[allow(clippy::cast_possible_truncation)]
 	fn internal_write_safe(&mut self, buf: &[u8], packet: SafeReadWritePacket, flush: bool, exit_on_lost: bool, delay: u64) {
 		assert!((buf.len() <= MAX_BUF_LEN), "Too large data packet sent over SafeReadWrite ({} > 0xFFFC)", buf.len());
 		let id = (self.packet_count_out as u16).to_be_bytes();
@@ -210,7 +212,7 @@ impl SafeReadWrite {
 										Err(_) => {
 											continue;
 										}
-									};
+									}
 									thread::sleep(Duration::from_millis(4));
 									break;
 								}
@@ -391,7 +393,7 @@ fn holepunch(cli: &Cli) -> UdpSocket {
 		println!("Sending using helper: {helper}");
 	} else {
 		println!("Receiving using helper: {helper}");
-	};
+	}
 	holepunch.connect(helper).expect("Unable to connect to helper");
 	let bytes = cli.tag.as_bytes();
 	let mut buf = [0_u8; MAP_LEN];
@@ -498,12 +500,12 @@ fn parse_cli(args: &[String]) -> Cli {
 				"-d" | "-r" | "-s" => {
 					if args.get(i + 1).is_none() {
 						usage(&cli, format!("Flag {} has no argument", args.get(i).unwrap()).as_str());
-					};
+					}
 					match args.get(i).unwrap().as_str() {
 						"-d" => cli.delay = args.get(i + 1).map(|s| s.parse::<u64>()).unwrap().expect("DELAY"),
 						"-r" => cli.bitrate = args.get(i + 1).map(|s| s.parse::<usize>()).unwrap().expect("BITRATE"),
 						_ => cli.start = args.get(i + 1).map(|s| s.parse::<u64>()).unwrap().expect("START"),
-					};
+					}
 					i += 1;
 				}
 				_ => {
@@ -575,6 +577,7 @@ COMMAND:
 	std::process::exit(1);
 }
 
+#[allow(clippy::cast_possible_truncation)]
 fn unix_millis() -> u64 {
 	SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as u64
 }
