@@ -5,7 +5,7 @@
 
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
-# qft v0.7.9
+# qft v0.7.10
 **Quick File Transfer, true peer-to-peer over UDP**
 
 QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
@@ -26,7 +26,7 @@ ping times of 1000ms are just as navigable as 10ms ones.
 ## Install
 ### Download static single-binary
 ```
-wget https://github.com/pepa65/qft/releases/download/0.7.9/qft
+wget https://github.com/pepa65/qft/releases/download/0.7.10/qft
 sudo mv qft /usr/local/bin
 sudo chown root:root /usr/local/bin/qft
 sudo chmod +x /usr/local/bin/qft
@@ -108,7 +108,7 @@ It will be installed in `~/.cargo/bin/` which will need to be added to `PATH`!
 
 ### Help text
 ```
-qft v0.7.9 - Quick file transfer
+qft v0.7.10 - Quick file transfer
 Usage:  qft [COMMAND [ARGUMENT...]]
 COMMAND:
     help (default command)    Just output this help text.
