@@ -1,6 +1,6 @@
 edition = "2024"
 hard_tabs = true
-newline_style = "Native"
+newline_style = "unix"
 fn_params_layout = "Compressed"
 #binop_separator = "Front"
 #condense_wildcard_suffixes = true

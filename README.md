@@ -1,11 +1,13 @@
-[![Rust](https://github.com/pepa65/qft/actions/workflows/rust.yml/badge.svg)](https://github.com/pepa65/qft/actions/workflows/rust.yml) 
-[![dependency status](https://deps.rs/repo/github/pepa65/aegis-cli/status.svg)](https://deps.rs/repo/github/pepa65/aegis-cli)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![version](https://img.shields.io/crates/v/qft.svg)](https://crates.io/crates/qft)
+[![build](https://github.com/pepa65/qft/actions/workflows/rust.yml/badge.svg)](https://github.com/pepa65/qft/actions/workflows/rust.yml) 
+[![dependencies](https://deps.rs/repo/github/pepa65/aegis-cli/status.svg)](https://deps.rs/repo/github/pepa65/aegis-cli)
+[![docs](https://img.shields.io/badge/docs-qft-blue.svg)](https://docs.rs/crate/qft/latest)
+[![license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/pepa65/qft/blob/main/LICENSE)
 [![downloads](https://img.shields.io/crates/d/qft.svg)](https://crates.io/crates/qft)
 
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
-# qft v0.7.10
+# qft v0.7.11
 **Quick File Transfer, true peer-to-peer over UDP**
 
 QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
@@ -26,7 +28,7 @@ ping times of 1000ms are just as navigable as 10ms ones.
 ## Install
 ### Download static single-binary
 ```
-wget https://github.com/pepa65/qft/releases/download/0.7.10/qft
+wget https://github.com/pepa65/qft/releases/download/0.7.11/qft
 sudo mv qft /usr/local/bin
 sudo chown root:root /usr/local/bin/qft
 sudo chmod +x /usr/local/bin/qft
@@ -108,7 +110,7 @@ It will be installed in `~/.cargo/bin/` which will need to be added to `PATH`!
 
 ### Help text
 ```
-qft v0.7.10 - Quick file transfer
+qft v0.7.11 - Quick file transfer
 Usage:  qft [COMMAND [ARGUMENT...]]
 COMMAND:
     help (default command)    Just output this help text.

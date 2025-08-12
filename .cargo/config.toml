@@ -3,6 +3,7 @@ rel = "build --release"
 inst = "install --path ."
 clip = "clippy --release"
 pub = "publish"
+up = "update --verbose"
 
 [build]
 target = "x86_64-unknown-linux-musl"
@@ -14,4 +15,7 @@ target = "x86_64-unknown-linux-musl"
 target = "x86_64-unknown-linux-musl"
 
 [clippy]
+target = "x86_64-unknown-linux-musl"
+
+[update]
 target = "x86_64-unknown-linux-musl"
