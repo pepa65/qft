@@ -77,7 +77,7 @@ It will be installed in `~/.cargo/bin/` which will need to be added to `PATH`!
   and the temporary random ports, and the chosen TAG for the exchange.
 * The hardcoded default helper is `tudbut.de:4277`.
 * The default helper can be specified in the environment variable `QFT_HELPER`, like:
-  `export QFT_HELPER=qft.4e4.in:1999`.
+  `export QFT_HELPER=qft.4e4.in:4444`.
 * A helper can be run on any machine that has the chosen port open to the internet:
   `qft helper [PORT]` and if the PORT number is higher than 1024, no privilege is needed.
   When not supplied, the port defaults to 4277. Running a helper is very low on CPU and
