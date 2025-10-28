@@ -8,7 +8,7 @@
 ![qft](https://raw.github.com/pepa65/qft/main/logo.png "Quick File Transfer")
 
 # qft v0.7.27
-**Quick File Transfer, true peer-to-peer over UDP**
+**Quick File Transfer, true peer-to-peer over UDP on CLI**
 
 QFT is a small stand-alone binary for quick and reliable true peer-to-peer UDP file transfer.
 As UDP is a connectionless protocol, there are no handshakes, data just gets sent. There is no
