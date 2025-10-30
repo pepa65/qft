@@ -1,6 +1,6 @@
 [package]
 name = "qft"
-version = "0.7.27"
+version = "0.7.28"
 edition = "2024"
 authors = ["github.com/pepa65", "Daniel H. github.com/tudbut"]
 description = "Quick File Transfer, true peer-to-peer over UDP on CLI"
