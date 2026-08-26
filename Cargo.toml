@@ -19,7 +19,7 @@ target-family = "Linux"
 target-arch = "X86_64"
 
 [dependencies]
-time = "0.3"
+time = "0.3.55"
 
 [profile.release]
 opt-level = "z"
