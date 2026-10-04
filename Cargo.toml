@@ -2,7 +2,7 @@
 name = "qft"
 version = "0.8.2"
 edition = "2024"
-rust_version = "1.88.0"
+rust-version = "1.88.0"
 authors = ["github.com/pepa65", "Daniel H. github.com/tudbut"]
 description = "Quick File Transfer, true peer-to-peer over UDP on CLI"
 repository = "https://github.com/pepa65/qft"
